@@ -35,7 +35,7 @@ router.post("/post", async (req, res) => {
     res.send(data);
   });
 
-//adds update to the data
+//publish new update to the data
   router.post("/update", async (req, res) => {
     let status = 200;
     let data = { "message": "save successfull" };
