@@ -12,6 +12,8 @@ app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
+
+
 app.use("/blog", blog);
 app.use("/comments", comments)
 app.use("/category", category)

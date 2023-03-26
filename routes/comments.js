@@ -1,5 +1,8 @@
 import express from "express";
-import firestore from "../utility/firestore.js";
+import { ObjectId } from "mongodb";
+import db from "../utility/mongo_driver.js";
+
+const collection = db.collection("comments")
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -7,9 +10,11 @@ router.get("/", async (req, res) => {
   let data;
   try {
     const body = req.body;
-    data = await firestore.f_getDoc(
-      `/users/${body.userId}/blog/${body.blogId}/comments/`
-    );
+    // data = await firestore.f_getDoc(
+    //   `/users/${body.userId}/blog/${body.blogId}/comments/`
+    // );
+    data = collection.find({"blogId" : body.blogId})
+    data = await data.toArray()
   } catch (error) {
     status = 401;
     data = { "message": `${error}` };
@@ -23,10 +28,11 @@ router.delete("/delete", async (req, res) => {
   let data = { "message": "deleted successfully" };
   try {
     const body = req.body;
-    await firestore.f_deleteDoc(
-      `/users/${body.userId}/blog/${body.blogId}/comments/`,
-      `${body.commentId}`
-    );
+    collection.deleteOne({"_id" : new ObjectId(body.commentId)})
+    // await firestore.f_deleteDoc(
+    //   `/users/${body.userId}/blog/${body.blogId}/comments/`,
+    //   `${body.commentId}`
+    // );
   } catch (error) {
     data = { "message": `${error}` };
     status = 401;
@@ -41,10 +47,11 @@ router.post("/post", async (req, res) => {
   let data = { "message": "save successfull" };
   try {
     const body = req.body;
-    await firestore.f_saveDoc(
-      `/users/${body.userId}/blog/${body.blogId}/comments/`,
-      body.commentData
-    );
+    // await firestore.f_saveDoc(
+    //   `/users/${body.userId}/blog/${body.blogId}/comments/`,
+    //   body.commentData
+    // );
+    await collection.insertOne(body)
   } catch (error) {
     data = { "message": `${error}` };
     status = 401;
@@ -60,11 +67,12 @@ router.post("/update", async (req, res) => {
   let data = { "message": "save successfull" };
   try {
     const body = req.body;
-    await firestore.f_updateDoc(
-      `/users/${body.userId}/blog/${body.blogId}/comments/`,
-      body.commentId,
-      body.updatedData
-    );
+    // await firestore.f_updateDoc(
+    //   `/users/${body.userId}/blog/${body.blogId}/comments/`,
+    //   body.commentId,
+    //   body.updatedData
+    // );
+    await collection.updateOne({"_id" : new ObjectId(body.commentId)}, {"$set" : body.update})
   } catch (error) {
     data = { "message": `${error}` };
     status = 401;
